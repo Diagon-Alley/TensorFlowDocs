@@ -4,6 +4,10 @@
 
 ![](https://raw.githubusercontent.com/Diagon-Alley/TensorFlowDocs/master/static/tensorflow_programming_environment.png)
 
+Note that tensorflow official documnetation strongly recommends focussing on the following 2 high-level APIs:
+* Estimators
+* Datasets
+
 Steps to get started with a simple machine learning problem using the sample programs of tensorflow
 
 * Import and parse the data
@@ -77,3 +81,38 @@ for key in train_x.keys():
     my_feature_columns.append(tf.feature_column.numeric_column(key=key))
 ```
 
+### Specifying a model
+
+To specify a model type we need to instantiate an **Estimator** class. Tensor flow provides 2 categories of estimators:
+* pre-made Estimators: Estimators written beforehand.
+* custom Estimators: Estimators to be written (atleast partially) by the developers.
+
+To implement the neural network the `premade_estimators.py` program uses a premade estimator called `tf.estimator.DNNClassifier`. The estimator builds a neural network that classifies examples.
+
+```python
+    classifier = tf.estimator.DNNClassifier(
+        feature_columns=my_feature_columns,
+        hidden_units=[10, 10],
+        n_classes=3)
+
+        # recall that my_feature_columns is a list of all the features using tf.feature_column with a key parameter
+        # hidden_units is simply the hidden layers. 10 in the first hidden layer and 10 in the second 
+        # hidden layer
+        # n_classes as you may have guessed is the number of classes in which to classify
+```
+
+Another important idea is that there is an optional keyword argument called `optimizer` The `optimizer` simply controls how our model will train. There is also `learning rate`
+
+### Training the model
+
+Now we have specified how the network architecture should be but have not trained the model. Now we need to train the model.
+
+```python
+    classifier.train(
+        input_fn=lambda:train_input_fn(train_feature, train_label, args.batch_size),
+        steps=args.train_steps)
+```
+
+The keyword argument steps is actually the argument that controls the number of iterations while having to train the model. The default value in this case is simply 1000. How many iterations a model requires again depends on experience.
+
+The `input_fn` parameter identifies the function that supplies the training data. Recall that we have simply built the training NN architecture. We have not trained it yet. The input function is simply required to do that. 
