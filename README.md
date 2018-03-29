@@ -156,3 +156,60 @@ As we talked about before, the **batch_size** is the number of examples trained 
 ```  
 returns one batch of examples back to the caller
 
+### Evaluating the model
+
+```python
+# Evaluate the model.
+eval_result = classifier.evaluate(
+    input_fn=lambda:eval_input_fn(test_x, test_y, args.batch_size))
+
+print('\nTest set accuracy: {accuracy:0.3f}\n'.format(**eval_result))
+```
+
+**`eval_input_fn`**
+
+```python
+def eval_input_fn(features, labels=None, batch_size=None):
+    """An input function for evaluation or prediction"""
+    if labels is None:
+        # No labels, use only features.
+
+        # The name of the function here is a little misleading. The official documentation of
+        # tensor flow has used the same function for both evaluation and prediction therefore during the 
+        # use in prediction it is totally possible to have no labels at all. 
+
+        inputs = features
+    else:
+        inputs = (features, labels)
+
+    # Convert inputs to a tf.dataset object.
+    dataset = tf.data.Dataset.from_tensor_slices(inputs)
+
+    # Batch the examples
+    assert batch_size is not None, "batch_size must not be None"
+    dataset = dataset.batch(batch_size)
+
+    # no need to shuffle and repeat and the like
+
+    # Return the read end of the pipeline.
+    return dataset.make_one_shot_iterator().get_next()
+```
+
+### Predicting
+
+```python
+    predict_x = {
+        'SepalLength': [5.1, 5.9, 6.9],
+        'SepalWidth': [3.3, 3.0, 3.1],
+        'PetalLength': [1.7, 4.2, 5.4],
+        'PetalWidth': [0.5, 1.5, 2.1],
+    }
+```
+
+```python
+predictions = classifier.predict(
+    input_fn=lambda:eval_input_fn(predict_x, batch_size=args.batch_size))
+
+# note that the same function is used both for evaluation and prediction
+```
+
