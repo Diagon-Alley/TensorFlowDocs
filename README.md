@@ -84,6 +84,7 @@ for key in train_x.keys():
 ### Specifying a model
 
 To specify a model type we need to instantiate an **Estimator** class. Tensor flow provides 2 categories of estimators:
+
 * pre-made Estimators: Estimators written beforehand.
 * custom Estimators: Estimators to be written (atleast partially) by the developers.
 
@@ -115,4 +116,17 @@ Now we have specified how the network architecture should be but have not traine
 
 The keyword argument steps is actually the argument that controls the number of iterations while having to train the model. The default value in this case is simply 1000. How many iterations a model requires again depends on experience.
 
-The `input_fn` parameter identifies the function that supplies the training data. Recall that we have simply built the training NN architecture. We have not trained it yet. The input function is simply required to do that. 
+The `input_fn` parameter identifies the function that supplies the training data. Recall that we have simply built the training NN architecture. We have not trained it yet. The input function is simply required to do that. Here is the method signature of the input function:
+
+```python
+def train_input_fn(features, labels, batch_size):
+```
+
+We pass the following parameters to the train_input_fn function:
+
+* `train_feature`: A python dictionary in which each key is the name of the feature and each value is the array containing the values for each example in the training set
+
+* `train_label`: Simply an array containing the values of the label for every example.
+
+* `arg.bactch_size`: A **batch** is the set of examples used in one iteration. The number of examples in a batch is the batch size. In case of stochastic gradient descent the batch size is 1. Obviously we know that in general gradient descent at one iteration only one example is used for training.
+
