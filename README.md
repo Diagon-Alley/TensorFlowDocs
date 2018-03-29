@@ -130,3 +130,29 @@ We pass the following parameters to the train_input_fn function:
 
 * `arg.bactch_size`: A **batch** is the set of examples used in one iteration. The number of examples in a batch is the batch size. In case of stochastic gradient descent the batch size is 1. Obviously we know that in general gradient descent at one iteration only one example is used for training.
 
+The idea here is that the `load_data` function is used for loading the data from the csv file. However the classifier does not take the raw data straightaway. It uses the train_input_fn for taking the data. 
+
+The `train_input_fn` relies on the **DataSet API**. This is a high level TensorFlow API for reading data and **transforming it in a form that `train` method requires**. The following call converts the input features into a `tf.data.Dataset` object. 
+
+```python
+dataset = tf.data.Dataset.from_tensor_slices(dict(features), labels)
+```
+
+The `tf.data.dataset` class provides many useful functions for preparing the examples for training. 
+
+```python
+    dataset = dataset.shuffle(buffer_size=1000).repeat(count=None).batch(batch_size)
+```
+
+Training is best when the examples are in random order. To randomize the examples, we are using the shuffle method which again returns a dataset instance. Setting the buffer_size greater than the number of examples ensures that the dataset is well shuffled. 
+
+The `train` method typically processes the examples multiple times. Calling the `tf.data.Dataset.repeat` method without any arguments ensures that the train method has an infinite supply of training examples.
+
+As we talked about before, the **batch_size** is the number of examples trained in one iteration. Here setting the batch size ensures that training is done in batches of `batch_size`. Note that a smaller batch size usually enables the `train` method to train the model faster at the expense of accuracy.
+
+
+```python
+   return dataset.make_one_shot_iterator().get_next()
+```  
+returns one batch of examples back to the caller
+
